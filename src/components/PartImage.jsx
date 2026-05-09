@@ -2,13 +2,17 @@ import { useState } from 'react'
 import { Camera, Image as ImageIcon } from 'lucide-react'
 
 /**
- * Real photo via loremflickr (Flickr-tagged) with stable seed per part.
+ * Real photos via picsum.photos (Fastly CDN) with stable seed per part.
+ * Was loremflickr — replaced because its origin is slow (multi-second loads on
+ * GitHub Pages). Picsum responds via Fastly edge in <300ms.
  * Falls back to a colorful gradient if the image fails to load.
  * Mobile-aware: srcset + sizes + lazy loading.
  */
 function buildUrl(tags, w, h, seed) {
-  const t = encodeURIComponent(tags || 'car')
-  return `https://loremflickr.com/${w}/${h}/${t}?lock=${seed}`
+  // tags is kept in the API for compatibility but not used by picsum.
+  // Stable seed → same photo every time for a given part.
+  void tags
+  return `https://picsum.photos/seed/${seed}/${w}/${h}.jpg`
 }
 
 export default function PartImage({
