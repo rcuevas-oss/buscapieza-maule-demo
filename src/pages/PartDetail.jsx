@@ -40,9 +40,7 @@ export default function PartDetail() {
         <div>
           <div className="card overflow-hidden relative">
             <PartImage
-              tags={part.imageTags}
-              seed={(part.imageSeed || 0) + active}
-              hue={(part.photoHue + active * 25) % 360}
+              category={part.category}
               count={total}
               className="aspect-[4/3] w-full"
               label={`${active + 1} / ${total}`}
@@ -79,9 +77,7 @@ export default function PartDetail() {
                 }`}
               >
                 <PartImage
-                  tags={part.imageTags}
-                  seed={(part.imageSeed || 0) + i}
-                  hue={(part.photoHue + i * 25) % 360}
+                  category={part.category}
                   className="aspect-square w-full"
                   alt=""
                 />

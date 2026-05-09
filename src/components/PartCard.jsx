@@ -19,9 +19,7 @@ export default function PartCard({ part }) {
     <article className="card overflow-hidden flex flex-col group hover:border-neon/40 transition">
       <Link to={`/repuesto/${part.id}`} className="block">
         <PartImage
-          tags={part.imageTags}
-          seed={part.imageSeed}
-          hue={part.photoHue}
+          category={part.category}
           count={part.images}
           className="aspect-[4/3] w-full"
           label={part.category}
