@@ -2,17 +2,41 @@ import { useState } from 'react'
 import { Camera, Image as ImageIcon } from 'lucide-react'
 
 /**
- * Real photos via picsum.photos (Fastly CDN) with stable seed per part.
- * Was loremflickr — replaced because its origin is slow (multi-second loads on
- * GitHub Pages). Picsum responds via Fastly edge in <300ms.
- * Falls back to a colorful gradient if the image fails to load.
- * Mobile-aware: srcset + sizes + lazy loading.
+ * Curated local photos served from GitHub Pages CDN (sub-50ms).
+ *
+ * Was loremflickr (slow, ~9s first hop), then picsum.photos (fast but random
+ * non-thematic). Now: 10 hand-picked Unsplash photos baked into the repo at
+ * /img/parts/01.jpg ... 10.jpg, each matching a part category. Keyword
+ * matching keeps the API backwards-compatible with the existing mockData.
  */
-function buildUrl(tags, w, h, seed) {
-  // tags is kept in the API for compatibility but not used by picsum.
-  // Stable seed → same photo every time for a given part.
-  void tags
-  return `https://picsum.photos/seed/${seed}/${w}/${h}.jpg`
+
+// Keyword → image-slot lookup. First hit wins; order is most-specific first.
+const KEYWORD_TO_SLOT = [
+  { kw: ['headlight', 'optic', 'óptic', 'foco', 'lampa'], slot: 1 },
+  { kw: ['bumper', 'parachoque'], slot: 2 },
+  { kw: ['wheel', 'rim', 'alloy', 'llanta', 'rueda'], slot: 3 },
+  { kw: ['grille', 'parrilla'], slot: 4 },
+  { kw: ['mirror', 'espejo'], slot: 5 },
+  { kw: ['engine', 'alternator', 'motor'], slot: 6 },
+  { kw: ['seat', 'bucket', 'asiento', 'baquet'], slot: 7 },
+  { kw: ['hood', 'rear', 'tail', 'capot', 'capó'], slot: 8 },
+  { kw: ['stereo', 'dashboard', 'tablero', 'panel'], slot: 9 },
+  { kw: ['suspension', 'coilover', 'amortig'], slot: 10 }
+]
+
+function tagsToSlot(tags, seed = 0) {
+  const t = (tags || '').toLowerCase()
+  for (const { kw, slot } of KEYWORD_TO_SLOT) {
+    if (kw.some((k) => t.includes(k))) return slot
+  }
+  // Fallback: distribute by seed across the 10 slots.
+  return ((Number(seed) || 0) % 10) + 1
+}
+
+function buildUrl(slot) {
+  const n = String(slot).padStart(2, '0')
+  // Vite injects BASE_URL (= "/buscapieza-maule-demo/" on GitHub Pages, "/" in dev).
+  return `${import.meta.env.BASE_URL}img/parts/${n}.jpg`
 }
 
 export default function PartImage({
@@ -26,39 +50,20 @@ export default function PartImage({
   alt = 'Repuesto'
 }) {
   const [failed, setFailed] = useState(false)
-
-  // card: 4:3 aspect — request narrower variants for mobile bandwidth.
-  // hero: 16:10 detail — bigger sizes.
-  const dims =
-    variant === 'hero'
-      ? [
-          { w: 600, h: 400 },
-          { w: 1000, h: 666 },
-          { w: 1400, h: 933 }
-        ]
-      : [
-          { w: 400, h: 300 },
-          { w: 640, h: 480 },
-          { w: 960, h: 720 }
-        ]
-
-  const sizesAttr =
-    variant === 'hero'
-      ? '(max-width: 640px) 100vw, (max-width: 1024px) 70vw, 720px'
-      : '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+  const slot = tagsToSlot(tags, seed)
+  const src = buildUrl(slot)
 
   return (
     <div
       className={`relative overflow-hidden bg-carbon-850 ${className}`}
       style={{ '--h': hue }}
     >
-      {!failed && tags ? (
+      {!failed ? (
         <img
-          src={buildUrl(tags, dims[1].w, dims[1].h, seed)}
-          srcSet={dims.map((d) => `${buildUrl(tags, d.w, d.h, seed)} ${d.w}w`).join(', ')}
-          sizes={sizesAttr}
-          loading="lazy"
+          src={src}
+          loading={variant === 'hero' ? 'eager' : 'lazy'}
           decoding="async"
+          fetchpriority={variant === 'hero' ? 'high' : 'auto'}
           alt={alt}
           onError={() => setFailed(true)}
           className="absolute inset-0 h-full w-full object-cover"
