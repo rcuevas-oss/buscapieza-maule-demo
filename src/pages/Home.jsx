@@ -154,13 +154,31 @@ export default function Home() {
 
       {/* CTA final */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14">
-        <div className="card p-8 md:p-12 border-neon/40 bg-gradient-to-br from-carbon-900 to-carbon-850">
-          <div className="grid md:grid-cols-[1fr_auto] gap-6 items-center">
+        <div className="relative overflow-hidden rounded-2xl border border-neon/40 bg-carbon-900 p-8 md:p-12 shadow-2xl">
+          <img
+            src={`${import.meta.env.BASE_URL}img/parts/p-006.jpg`}
+            alt=""
+            aria-hidden
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover opacity-25"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-gradient-to-r from-carbon-950 via-carbon-950/85 to-carbon-900/40"
+          />
+          <div
+            aria-hidden
+            className="absolute -right-32 -top-32 h-[420px] w-[420px] rounded-full bg-neon/10 blur-3xl"
+          />
+          <div className="relative grid md:grid-cols-[1fr_auto] gap-6 items-center">
             <div>
-              <h3 className="font-display text-2xl md:text-3xl font-semibold text-white">
+              <span className="inline-flex items-center gap-2 rounded-full border border-neon/30 bg-neon/10 px-3 py-1 text-xs text-neon">
+                <MessageSquareReply className="h-3.5 w-3.5" /> Publicar búsqueda
+              </span>
+              <h3 className="mt-4 font-display text-2xl md:text-3xl font-semibold text-white leading-tight">
                 ¿No encontraste tu pieza?
               </h3>
-              <p className="muted mt-2">
+              <p className="muted mt-2 max-w-xl">
                 Publica una búsqueda en 30 segundos. Los cazadores del Maule te van a leer.
               </p>
             </div>
