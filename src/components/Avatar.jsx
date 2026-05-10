@@ -36,12 +36,16 @@ function hash(str) {
   return Math.abs(h)
 }
 
+// Regex range for combining diacritical marks, written as Unicode escapes so
+// it survives any minifier that normalizes source-level combining characters.
+const DIACRITICS = new RegExp('[\\u0300-\\u036f]', 'g')
+
 function firstNameSlug(name) {
   if (!name) return ''
   return String(name)
     .trim()
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(DIACRITICS, '')
     .toLowerCase()
     .split(/\s+/)[0]
     .replace(/[^a-z]/g, '')

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Redirigiendo · BuscaPieza Maule</title>
+    <meta name="robots" content="noindex" />
+    <script>
+      // GitHub Pages 404 → HashRouter rewrite.
+      // Anyone landing on /buscapieza-maule-demo/foo gets bounced to
+      // /buscapieza-maule-demo/#/foo so the SPA can pick it up.
+      (function () {
+        var BASE = '/buscapieza-maule-demo';
+        var path = window.location.pathname;
+        var search = window.location.search || '';
+        var hash = window.location.hash || '';
+
+        // Strip the base prefix; what remains is the requested route.
+        var route = path.indexOf(BASE) === 0 ? path.slice(BASE.length) : path;
+        if (!route || route === '/') {
+          window.location.replace(BASE + '/' + search + hash);
+          return;
+        }
+        // Rebuild as base + #route, preserving any query string.
+        window.location.replace(BASE + '/#' + route + search + hash);
+      })();
+    </script>
+    <style>
+      body { background: #0a0a0a; color: #d4d4d8; font-family: system-ui, sans-serif; display: grid; place-items: center; min-height: 100vh; margin: 0; }
+      .box { text-align: center; }
+      .dot { display: inline-block; width: 8px; height: 8px; border-radius: 999px; background: #ff6a1a; box-shadow: 0 0 12px #ff6a1a; animation: pulse 1s ease-in-out infinite; }
+      @keyframes pulse { 50% { opacity: 0.3; } }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <span class="dot"></span>
+      <p>Redirigiendo…</p>
+    </div>
+  </body>
+</html>
