@@ -1,5 +1,9 @@
 # BuscaPieza Maule — Maqueta visual
 
+> **Sitio público canónico:** https://larefactoria.cl/demos/buscapieza-maule
+>
+> Esta demo se migró al monorepo de la agencia (`apps/landing/pages/demos/buscapieza-maule/`) y ahora se sirve directamente desde larefactoria.cl. Este repo se mantiene como histórico de la versión standalone — el deploy a GitHub Pages está desactivado.
+
 Marketplace local de repuestos usados de autos para la región del Maule.
 **Solo demo visual, sin backend real, sin pagos, sin WhatsApp API.**
 
