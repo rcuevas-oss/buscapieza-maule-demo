@@ -1,21 +1,29 @@
 import { Link } from 'react-router-dom'
 import { MapPin, MessageSquareReply, Clock, Banknote } from 'lucide-react'
 import { UrgencyBadge } from './StatusBadge.jsx'
+import Avatar from './Avatar.jsx'
 import { formatCLP } from '../data/mockData.js'
 
 export default function RequestCard({ request, compact = false }) {
   return (
     <article className="card p-4 flex flex-col gap-3 hover:border-neon/40 transition">
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start gap-3">
+        <Avatar name={request.author} size="md" showStatus />
         <div className="flex-1 min-w-0">
-          <h3 className="font-display text-[15px] font-semibold text-white leading-snug">
-            {request.title}
-          </h3>
-          <div className="mt-1.5 text-xs muted">
-            por {request.author} · publicado {request.publishedDaysAgo === 0 ? 'hoy' : `hace ${request.publishedDaysAgo}d`}
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="font-display text-[15px] font-semibold text-white leading-snug">
+              {request.title}
+            </h3>
+            <UrgencyBadge urgency={request.urgency} />
+          </div>
+          <div className="mt-1 text-xs muted">
+            <span className="text-zinc-200 font-medium">{request.author}</span>{' '}
+            · publicado{' '}
+            {request.publishedDaysAgo === 0
+              ? 'hoy'
+              : `hace ${request.publishedDaysAgo}d`}
           </div>
         </div>
-        <UrgencyBadge urgency={request.urgency} />
       </div>
 
       <div className="flex flex-wrap gap-1.5">
@@ -41,10 +49,7 @@ export default function RequestCard({ request, compact = false }) {
         </div>
       </div>
 
-      <Link
-        to={`/responder/${request.id}`}
-        className="btn-primary !py-2 mt-1"
-      >
+      <Link to={`/responder/${request.id}`} className="btn-primary !py-2 mt-1">
         <MessageSquareReply className="h-4 w-4" />
         Responder con oferta
       </Link>
