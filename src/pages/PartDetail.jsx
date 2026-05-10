@@ -40,6 +40,7 @@ export default function PartDetail() {
         <div>
           <div className="card overflow-hidden relative">
             <PartImage
+              partId={part.id}
               category={part.category}
               count={total}
               className="aspect-[4/3] w-full"
@@ -77,6 +78,7 @@ export default function PartDetail() {
                 }`}
               >
                 <PartImage
+                  partId={part.id}
                   category={part.category}
                   className="aspect-square w-full"
                   alt=""

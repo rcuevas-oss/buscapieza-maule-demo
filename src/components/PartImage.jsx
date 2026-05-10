@@ -11,16 +11,29 @@ import {
   Zap,
   Car
 } from 'lucide-react'
+import { useState } from 'react'
 
 /**
- * Illustrated placeholder per category — no fake photos.
+ * Real photo when available, illustrated placeholder otherwise.
  *
- * Honest placeholder: marketplaces like MercadoLibre or Yapo show category
- * icons until sellers upload real photos of the actual part. Trying to use
- * generic Unsplash shots was confusing the user (e.g. McLaren image labeled
- * "Espejo lateral Yaris"). When real sellers publish, their photos replace
- * this and the API stays the same.
+ * Parts whose ID is listed in PARTS_WITH_PHOTOS have a curated photo at
+ * /img/parts/<id>.jpg. Anything else falls back to a category-based icon
+ * placeholder (the convention MercadoLibre / Yapo use until a seller uploads
+ * a real image). When a real photo fails to load, also fall back to placeholder.
  */
+
+const PARTS_WITH_PHOTOS = new Set([
+  'p-001',
+  'p-002',
+  'p-003',
+  'p-004',
+  'p-005',
+  'p-006',
+  'p-007',
+  'p-008',
+  'p-009',
+  'p-010'
+])
 
 const CATEGORY_ICONS = {
   opticas: Lightbulb,
@@ -48,14 +61,7 @@ const CATEGORY_LABELS = {
   carroceria: 'Carrocería'
 }
 
-export default function PartImage({
-  category,
-  count = 1,
-  className = '',
-  label,
-  variant = 'card', // 'card' | 'hero'
-  alt = 'Repuesto'
-}) {
+function Placeholder({ category, variant }) {
   const Icon = CATEGORY_ICONS[category] || ImageIcon
   const categoryLabel = CATEGORY_LABELS[category] || ''
 
@@ -65,12 +71,9 @@ export default function PartImage({
       : 'h-16 w-16 sm:h-20 sm:w-20'
 
   return (
-    <div
-      role="img"
-      aria-label={alt}
-      className={`relative overflow-hidden bg-gradient-to-br from-carbon-900 via-carbon-850 to-carbon-900 ${className}`}
-    >
-      {/* Grid pattern overlay — subtle industrial vibe */}
+    <>
+      <div className="absolute inset-0 bg-gradient-to-br from-carbon-900 via-carbon-850 to-carbon-900" />
+
       <div
         aria-hidden
         className="absolute inset-0 opacity-[0.07]"
@@ -81,7 +84,6 @@ export default function PartImage({
         }}
       />
 
-      {/* Diagonal gradient accent */}
       <div
         aria-hidden
         className="absolute -top-1/4 -right-1/4 h-2/3 w-2/3 rounded-full bg-orange-500/10 blur-3xl"
@@ -91,7 +93,6 @@ export default function PartImage({
         className="absolute -bottom-1/4 -left-1/4 h-1/2 w-1/2 rounded-full bg-cyan-500/[0.06] blur-3xl"
       />
 
-      {/* Centered icon with glow */}
       <div className="absolute inset-0 grid place-items-center">
         <div className="relative">
           <div
@@ -112,24 +113,59 @@ export default function PartImage({
         </div>
       </div>
 
-      {/* Bottom dark gradient for badges */}
-      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 to-transparent pointer-events-none" />
-
-      {/* Faint corner watermark — "imagen referencial" */}
       {variant !== 'hero' && (
         <span className="absolute top-2 left-2 font-mono text-[9px] uppercase tracking-[0.16em] text-white/35">
           Imagen referencial
         </span>
       )}
+    </>
+  )
+}
 
-      {/* Existing label slot (category name from caller) */}
+export default function PartImage({
+  partId,
+  category,
+  count = 1,
+  className = '',
+  label,
+  variant = 'card', // 'card' | 'hero'
+  alt = 'Repuesto'
+}) {
+  const hasPhoto = partId && PARTS_WITH_PHOTOS.has(partId)
+  const [photoFailed, setPhotoFailed] = useState(false)
+  const showPhoto = hasPhoto && !photoFailed
+
+  const photoSrc = `${import.meta.env.BASE_URL}img/parts/${partId}.jpg`
+
+  return (
+    <div
+      role="img"
+      aria-label={alt}
+      className={`relative overflow-hidden bg-carbon-900 ${className}`}
+    >
+      {showPhoto ? (
+        <img
+          src={photoSrc}
+          loading={variant === 'hero' ? 'eager' : 'lazy'}
+          decoding="async"
+          fetchpriority={variant === 'hero' ? 'high' : 'auto'}
+          alt={alt}
+          onError={() => setPhotoFailed(true)}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      ) : (
+        <Placeholder category={category} variant={variant} />
+      )}
+
+      {/* Bottom dark gradient for badges (over photo or placeholder) */}
+      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 to-transparent pointer-events-none" />
+
       {label && (
         <div className="absolute bottom-2 left-2 rounded-md bg-black/60 backdrop-blur px-2 py-1 text-[10px] uppercase tracking-wider text-white/90">
           {label}
         </div>
       )}
 
-      {/* Photo count badge */}
       {count > 1 && (
         <div className="absolute top-2 right-2 inline-flex items-center gap-1 rounded-md bg-black/60 backdrop-blur px-2 py-1 text-[11px] text-white/90">
           <Camera className="h-3 w-3" /> {count}
